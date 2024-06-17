@@ -1,0 +1,12 @@
+[package]
+name = "qbitop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+qbit-rs = {path = "../qbit"}
+tokio = {workspace = true, features = ["full"]}
+clap = {workspace = true, features = ["derive"]}
+serde = { workspace = true, features = ["derive"] }
+bincode.workspace = true
+toolbox = { path = "../toolbox" }
