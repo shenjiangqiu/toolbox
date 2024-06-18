@@ -21,3 +21,4 @@ bincode = "1.3.3"
 [dependencies]
 toolbox = { path = "crates/toolbox" }
 bincode.workspace = true
+clap = {workspace = true, features = ["derive"]}
