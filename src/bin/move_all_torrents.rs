@@ -1,4 +1,4 @@
-use std::io::BufReader;
+use std::{io::BufReader, path::PathBuf};
 
 use clap::Parser;
 use toolbox::TorrentInfo;
@@ -17,7 +17,14 @@ fn main() {
         let category = t.info.category;
         let from = std::path::PathBuf::from(t.info.content_path.unwrap());
         let from = if from.starts_with("/home/sjq") {
-            from
+            if from.starts_with("/home/sjq/sjqbcachefs") {
+                let mut from = from.to_string_lossy().to_string();
+                from.replace_range(..21, "/home/sjq/usb/sjqbcachefs");
+                PathBuf::from(from)
+            } else {
+                assert!(from.starts_with("/home/sjq/usb"));
+                from
+            }
         } else {
             panic!("save_path is not or /home/sjq");
         };
@@ -31,7 +38,11 @@ fn main() {
         if cli.dry_run {
             println!("from: {:?}, to: {:?}", from, to);
         } else {
-            std::fs::rename(from, to).unwrap();
+            let to_parent = to.parent().unwrap();
+            if !to_parent.exists() {
+                std::fs::create_dir_all(to_parent).unwrap();
+            }
+            std::fs::rename(&from, &to).unwrap_or_else(|e| println!("error: {e} {:?},{:?}",from,to));
         }
     }
 }

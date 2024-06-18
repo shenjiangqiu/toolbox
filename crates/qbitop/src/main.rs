@@ -1,14 +1,10 @@
 use std::{
-    fs::File,
-    io::{BufReader, BufWriter},
-    ops::Deref,
-    path::PathBuf,
-    sync::Arc,
+    collections::BTreeSet, fs::File, io::{stdin, BufReader, BufWriter}, ops::Deref, path::PathBuf, sync::Arc
 };
 
 use clap::{Args, Parser};
 use qbit_rs::{
-    model::{AddTorrentArg, Credential, TorrentFile},
+    model::{AddTorrentArg, Credential, NonEmptyStr, TorrentFile},
     Qbit,
 };
 use tokio::sync::Mutex;
@@ -83,7 +79,21 @@ async fn main() {
         }) => {
             let qbit = Qbit::new(url.as_str(), Credential::new(&username, &password));
             let info: Vec<TorrentInfo> =
-                bincode::deserialize_from(File::open(infofile).unwrap()).unwrap();
+                bincode::deserialize_from(BufReader::new(File::open(infofile).unwrap())).unwrap();
+            // first add the cats
+            let category:BTreeSet<_> = info.iter().filter_map(|t| {
+                t.info.category.as_ref()
+            }).collect();
+            for c in &category {
+                println!("cat: {c}");
+            }
+            println!("continue?");
+            stdin().read_line(&mut String::new()).unwrap();
+            for c in category {
+                qbit.add_category(NonEmptyStr::new(c).unwrap(), "").await.unwrap();
+            }
+            println!("finished adding,continue?");
+            stdin().read_line(&mut String::new()).unwrap();
             for i in info {
                 qbit.add_torrent(AddTorrentArg {
                     source: qbit_rs::model::TorrentSource::TorrentFiles {
