@@ -1,39 +1,23 @@
-use std::{error::Error, io};
+use std::io;
 
-use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-};
-use ratatui::{
-    backend::{Backend, CrosstermBackend},
-    Terminal,
-};
+use crossterm::event::{self, Event, KeyCode, KeyEventKind};
+use ratatui::{backend::Backend, Terminal};
 
-use tools::{
+use toolbox::{
     app::{App, CurrentScreen, CurrentlyEditing},
     ui::ui,
 };
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> eyre::Result<()> {
     // setup terminal
-    enable_raw_mode()?;
-    let mut stderr = io::stderr(); // This is a special case. Normally using stdout is fine
-    execute!(stderr, EnterAlternateScreen, EnableMouseCapture)?;
-    let backend = CrosstermBackend::new(stderr);
-    let mut terminal = Terminal::new(backend)?;
-
+    toolbox::errors::install_hooks().unwrap();
+    let mut terminal = toolbox::tui::init().unwrap();
     // create app and run it
     let mut app = App::new();
     let res = run_app(&mut terminal, &mut app);
-
     // restore terminal
-    disable_raw_mode()?;
-    execute!(
-        terminal.backend_mut(),
-        LeaveAlternateScreen,
-        DisableMouseCapture
-    )?;
+    toolbox::tui::restore().unwrap();
+
     terminal.show_cursor()?;
 
     if let Ok(do_print) = res {
@@ -43,7 +27,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     } else if let Err(err) = res {
         println!("{err:?}");
     }
-
     Ok(())
 }
 

@@ -155,6 +155,7 @@ pub fn ui(f: &mut Frame, app: &App) {
         let area = centered_rect(60, 25, f.size());
         f.render_widget(exit_paragraph, area);
     }
+
 }
 
 /// helper function to create a centered rect using up certain percentage of the available rect `r`

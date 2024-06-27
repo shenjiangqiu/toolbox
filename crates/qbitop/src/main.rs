@@ -8,7 +8,7 @@ use qbit_rs::{
     Qbit,
 };
 use tokio::sync::Mutex;
-use toolbox::TorrentInfo;
+use toolbox_core::TorrentInfo;
 
 #[derive(Args, Debug)]
 struct QbitArgs {

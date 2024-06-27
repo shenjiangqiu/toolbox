@@ -9,4 +9,4 @@ tokio = {workspace = true, features = ["full"]}
 clap = {workspace = true, features = ["derive"]}
 serde = { workspace = true, features = ["derive"] }
 bincode.workspace = true
-toolbox = { path = "../toolbox" }
+toolbox_core = { path = "../core" }

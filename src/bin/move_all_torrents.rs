@@ -1,7 +1,7 @@
 use std::{io::BufReader, path::PathBuf};
 
 use clap::Parser;
-use toolbox::TorrentInfo;
+use toolbox_core::TorrentInfo;
 #[derive(Parser)]
 struct Cli {
     #[clap(short, long)]
